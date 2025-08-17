@@ -772,7 +772,8 @@ function printReceipt(transaction, anggota) {
     receiptText += "Telp/WA 081374195580\n";
     receiptText += "\n";
 
-    const waLink = "https://wa.me/6281374195580";
+    const waLink =
+        "https://dash.infinityfree.com/accounts/if0_39709336/domains/cashierapliaction.free.nf";
 
     const qrCodeCommands = generateQRCode(waLink);
 
