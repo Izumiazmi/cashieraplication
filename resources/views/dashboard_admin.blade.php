@@ -6,6 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fixed Layout Dashboard</title>
     <link rel="stylesheet" href="{{ asset('css/sementara.css') }}">
+    <style>
+        .todo-items li.checked span {
+            text-decoration: line-through;
+            color: #888;
+        }
+
+    </style>
+
 </head>
 
 <body class="dashboard-layout">
@@ -73,7 +81,7 @@
                                 @foreach ($todoItems as $todo)
                                 <li>
                                     <label>
-                                        <input type="checkbox">
+                                        <input type="checkbox" data-id="{{ $todo->id }}">
                                         <span>{{ $todo->text }}</span>
                                     </label>
                                     <form action="{{ route('admin.todos.delete', ['token' => $token, 'todo' => $todo->id]) }}" method="POST" style="display:inline;">
@@ -112,21 +120,73 @@
         let myChart;
 
         document.addEventListener('DOMContentLoaded', function() {
+            // =======================================================
+            // --- KODE UNTUK TO DO LIST (BAGIAN BARU) ---
+            // =======================================================
+
+            const todoContainer = document.querySelector('.todo-list-container');
+
+            // Fungsi untuk memuat status dari Local Storage saat halaman dibuka
+            const loadTodoState = () => {
+                const checkboxes = todoContainer.querySelectorAll('input[type="checkbox"]');
+                checkboxes.forEach(checkbox => {
+                    const todoId = checkbox.dataset.id;
+                    // Ambil status dari local storage, jika 'true' maka centang
+                    const isChecked = localStorage.getItem(`todo-${todoId}`) === 'true';
+
+                    checkbox.checked = isChecked;
+
+                    // Tambahkan class 'checked' ke parent <li> untuk styling (coretan)
+                    if (isChecked) {
+                        checkbox.closest('li').classList.add('checked');
+                    }
+                });
+            };
+
+            // Event listener untuk seluruh kontainer to-do list
+            if (todoContainer) {
+                todoContainer.addEventListener('change', (event) => {
+                    // Hanya jalankan jika yang berubah adalah sebuah checkbox
+                    if (event.target.matches('input[type="checkbox"]')) {
+                        const checkbox = event.target;
+                        const todoId = checkbox.dataset.id;
+                        const listItem = checkbox.closest('li');
+
+                        // Simpan status baru ke Local Storage (true/false)
+                        localStorage.setItem(`todo-${todoId}`, checkbox.checked);
+
+                        // Atur style coretan berdasarkan status
+                        if (checkbox.checked) {
+                            listItem.classList.add('checked');
+                        } else {
+                            listItem.classList.remove('checked');
+                        }
+                    }
+                });
+            }
+
+            // Panggil fungsi untuk memuat status saat halaman siap
+            loadTodoState();
+
+
+            // =======================================================
+            // --- KODE CHART.JS DAN THEME TOGGLE MILIKMU (TETAP SAMA) ---
+            // =======================================================
+
             const ctx = document.getElementById('myPieChart');
             const themeToggle = document.getElementById('themeToggle');
             const chartDataFromPHP = @json(isset($chartData) ? $chartData : ['aktif' => 0, 'nonAktif' => 0]);
 
             // SET DEFAULT: TEMA GELAP AKTIF
             document.body.classList.add('dark-theme');
-            themeToggle.checked = true;
+            if (themeToggle) themeToggle.checked = true;
 
             const data = {
                 labels: ['Active', 'Non-Active']
                 , datasets: [{
                     label: 'Member'
                     , data: [
-                        chartDataFromPHP.aktif
-                        , chartDataFromPHP.nonAktif
+                        chartDataFromPHP.aktif, chartDataFromPHP.nonAktif
                     ]
                     , backgroundColor: ['#196b04ff', '#800a0aff']
                     , borderColor: '#2d2d2d'
@@ -160,9 +220,9 @@
                             }
                             , formatter: (value, context) => {
                                 const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                if (total === 0) return '0%'; // Hindari pembagian dengan nol
                                 const percentage = (value / total * 100).toFixed(1) + '%';
                                 return percentage;
-                                // return value; // Cukup tampilkan angka aslinya
                             }
                         }
                     }
@@ -170,9 +230,10 @@
                 , plugins: [ChartDataLabels]
             };
 
-            myChart = new Chart(ctx, config);
+            if (ctx) {
+                myChart = new Chart(ctx, config);
+            }
 
-            // Fungsi untuk update tema dan chart
             function updateTheme(isDark) {
                 document.body.classList.toggle('dark-theme', isDark);
 
@@ -186,17 +247,18 @@
                 }
             }
 
-            // Toggle event
-            themeToggle.addEventListener('change', function() {
-                const isDark = this.checked;
-                updateTheme(isDark);
-            });
+            if (themeToggle) {
+                themeToggle.addEventListener('change', function() {
+                    const isDark = this.checked;
+                    updateTheme(isDark);
+                });
+            }
 
-            // Jalankan sekali saat awal load
             updateTheme(true); // karena default-nya adalah dark
         });
 
     </script>
+
     <script src="{{ asset('js/script.js') }}"></script>
 </body>
 
