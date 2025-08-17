@@ -498,9 +498,8 @@
         <div class="footer-content">
             <p>&copy; 2025 <a href="https://izumiazmi.github.io/portofolio-azmi/">Izumi. </a>Hak Cipta Dilindungi.</p>
             <ul class="social-links">
-                <li><a href="https://www.instagram.com/azmi_14.11/" aria-label="Instagram"><i class="fab fa-instagram"></i></a></li>
+                <li><a href="https://github.com/Izumiazmi" aria-label="Github"><i class="fab fa-github"></i></a></li>
                 <li><a href="https://www.linkedin.com/in/muhammad-habib-al-azmi?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" aria-label="Linkedin"><i class="fab fa-linkedin"></i></a></li>
-                <li><a href="https://wa.me/6281374195580" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a></li>
             </ul>
         </div>
     </footer>
